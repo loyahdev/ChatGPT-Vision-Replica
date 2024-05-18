@@ -61,7 +61,7 @@ def process_files():
             {
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": "Heres the question: " + transcript + ". Make the response quick and consise. ONLY and ONLY tell what the main thing the image is or what I asked for."},
+                    {"type": "text", "text": "Heres the question: " + transcript + ". Make the response quick and consise. ONLY and ONLY tell what the main thing the image is or what I asked for. Make it human like and make it maximum 2-3 sentences of a response unless more is needed."},
                     {
                         "type": "image_url",
                         "image_url": {
