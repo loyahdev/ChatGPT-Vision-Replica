@@ -9,6 +9,11 @@ app = Flask(__name__)
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
+        
+@app.route('/')
+def index():
+    return jsonify({"Choo Choo": "Welcome to your Flask app 🚅"})
+
 
 @app.route('/process', methods=['POST'])
 def process_files():
