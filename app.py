@@ -12,7 +12,7 @@ def encode_image(image_path):
         
 @app.route('/')
 def index():
-    return jsonify({"Choo Choo": "Welcome to your Flask app 🚅"})
+    return jsonify({"Server Running": "Welcome to your favourite server!"})
 
 
 @app.route('/process', methods=['POST'])
@@ -32,14 +32,14 @@ def process_files():
     audio_file.save(audio_path)
 
     # Transcribe audio using OpenAI Whisper API
-    '''with open(audio_path, "rb") as audio:
+    with open(audio_path, "rb") as audio:
         transcript_response = openai.audio.transcriptions.create(
             model="whisper-1",
             file=audio
-        )'''
+        )
 
-    '''transcript = transcript_response.text
-    print(f"Transcript: {transcript}")'''
+    transcript = transcript_response.text
+    print(f"Transcript: {transcript}")
 
     image_path = os.path.join(os.getcwd(), "image_file.png")
     image_file.save(image_path)
@@ -61,7 +61,7 @@ def process_files():
             {
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": "Whats happening in this image?"}, #"Heres the question: " + transcript + ". Make the response quick and consise. ONLY and ONLY tell what the main thing the image is. Such as in a kitchen it would be an oven. Only tell the rest if asked. Make the responses short, full, and naturally human like. Switch it up every so often with different responses or fun words like 'Oh! or 'Hey! for example. And remember to be as human like as possible"},
+                    {"type": "text", "text": "Heres the question: " + transcript + ". Make the response quick and consise. ONLY and ONLY tell what the main thing the image is or what I asked for."},
                     {
                         "type": "image_url",
                         "image_url": {
