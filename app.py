@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
 import openai
 import os
-import concurrent.futures
 from io import BytesIO
 import base64
+import concurrent.futures
 
 app = Flask(__name__)
 
@@ -53,6 +53,8 @@ def process_files():
         return transcript_response.text
 
     def generate_response(transcript, base64_image):
+        print(f"Generating response for transcript: {transcript}")
+        print(f"Using base64 image: {base64_image[:50]}...")  # Print a snippet of the base64 string
         response = openai.chat.completions.create(
             model=model_chat,
             messages=[
@@ -64,12 +66,12 @@ def process_files():
                             "type": "image_url",
                             "image_url": {
                                 "url": "data:image/jpeg;base64," + base64_image,
-                            },
-                        },
-                    ],
+                            }
+                        }
+                    ]
                 }
             ],
-            max_tokens=50,
+            max_tokens=50
         )
         return response.choices[0].message.content
 
