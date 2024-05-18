@@ -3,6 +3,7 @@ import openai
 import os
 import time
 import base64
+from io import BytesIO
 
 app = Flask(__name__)
 
@@ -14,11 +15,9 @@ def encode_image(image_path):
 def index():
     return jsonify({"Server Running": "Welcome to your favourite server!"})
 
-
 @app.route('/process', methods=['POST'])
 def process_files():
-    print("request received")
-    #start_time = time.time()
+    print("Request received")
 
     # Check if files are in the request
     if 'audio' not in request.files or 'image' not in request.files:
@@ -45,12 +44,9 @@ def process_files():
     image_file.save(image_path)
 
     # Verify image format and size
-    # if not image_path.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
-        # return jsonify({'error': 'Unsupported image format'}), 400
-    
     image_size = os.path.getsize(image_path)
     if image_size > 10 * 1024 * 1024:
-        return jsonify({'error': 'Image file size exceeds 20 MB'}), 400
+        return jsonify({'error': 'Image file size exceeds 10 MB'}), 400
     
     # Encode image to base64
     base64_image = encode_image(image_path)
@@ -61,7 +57,7 @@ def process_files():
             {
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": "Heres the question: " + transcript + ". Make the response quick and consise. ONLY and ONLY tell what the main thing the image is or what I asked for. Make it human like and make it maximum 2-3 sentences of a response unless more is needed."},
+                    {"type": "text", "text": "Here's the question: " + transcript + ". Make the response quick and concise. ONLY and ONLY tell what the main thing the image is or what I asked for. Make it human like and make it maximum 2-3 sentences of a response unless more is needed."},
                     {
                         "type": "image_url",
                         "image_url": {
@@ -77,10 +73,25 @@ def process_files():
     response_text = response.choices[0].message.content
     print(f"Response: {response_text}")
 
-    # total_time = time.time() - start_time
-    # print(f"Total Time: {total_time:.2f} seconds")
+    # Generate speech from the response text using OpenAI's TTS API
+    speech_file = BytesIO()
+    tts_response = openai.audio.speech.create(
+        model="tts-1",
+        voice="alloy",
+        input=response_text
+    )
 
-    return response_text
+    tts_response.stream_to_file(speech_file)
+    speech_file.seek(0)  # Rewind the buffer for reading
+
+    # Encode the MP3 file to base64
+    speech_base64 = base64.b64encode(speech_file.read()).decode('utf-8')
+
+    # Return both the response text and the speech MP3 file
+    return jsonify({
+        'response_text': response_text,
+        'speech_mp3': speech_base64
+    })
 
 if __name__ == '__main__':
     app.run(debug=True, port=os.getenv("PORT", default=5000))
