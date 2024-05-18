@@ -70,7 +70,7 @@ def process_files():
         max_tokens=50,
     )
 
-    return response.choices[0].message.content
+    response_text = response.choices[0].message.content
     print(f"Response: {response_text}")
 
     # Generate speech from the response text using OpenAI's TTS API
