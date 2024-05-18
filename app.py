@@ -55,7 +55,7 @@ def process_files():
     base64_image = encode_image(image_path)
 
     response = openai.chat.completions.create(
-        model="gpt-4-turbo",
+        model="gpt-4o",
         messages=[
             {
                 "role": "user",
