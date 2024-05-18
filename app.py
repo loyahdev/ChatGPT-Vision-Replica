@@ -48,14 +48,14 @@ def process_files():
         return jsonify({'error': 'Unsupported image format'}), 400
     
     image_size = os.path.getsize(image_path)
-    if image_size > 20 * 1024 * 1024:
+    if image_size > 5 * 1024 * 1024:
         return jsonify({'error': 'Image file size exceeds 20 MB'}), 400
     
     # Encode image to base64
     base64_image = encode_image(image_path)
 
     response = openai.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4-turbo",
         messages=[
             {
                 "role": "user",
