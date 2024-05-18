@@ -37,7 +37,7 @@ def process_files():
             file=audio
         )
 
-    transcript = transcript_response.get('text')
+    transcript = transcript_response.text
     print(f"Transcript: {transcript}")
 
     image_path = os.path.join(os.getcwd(), "image_file.png")
@@ -70,7 +70,7 @@ def process_files():
         max_tokens=50,
     )
 
-    response_text = response['choices'][0]['message']['content']
+    response_text = response.choices[0].message.content
     print(f"Response: {response_text}")
 
     # Generate speech from the response text using OpenAI's TTS API
