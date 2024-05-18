@@ -14,8 +14,9 @@ model_tts = "tts-1"
 voice_tts = "alloy"
 max_image_size = 10 * 1024 * 1024  # 10 MB
 
-def encode_image(image_file):
-    return base64.b64encode(image_file.read()).decode('utf-8')
+def encode_image(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
 
 @app.route('/')
 def index():
@@ -86,7 +87,7 @@ def process_files():
         speech_file.seek(0)  # Rewind the buffer for reading
         return base64.b64encode(speech_file.read()).decode('utf-8')
 
-    base64_image = encode_image(request.files['image'])
+    base64_image = encode_image(image_path)
 
     # Use threading to run non-dependent tasks in parallel
     with concurrent.futures.ThreadPoolExecutor() as executor:
