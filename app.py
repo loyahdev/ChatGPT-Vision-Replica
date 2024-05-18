@@ -17,6 +17,7 @@ def index():
 
 @app.route('/process', methods=['POST'])
 def process_files():
+    print("request received")
     #start_time = time.time()
 
     # Check if files are in the request
