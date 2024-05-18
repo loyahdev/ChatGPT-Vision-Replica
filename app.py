@@ -3,7 +3,7 @@ import openai
 import os
 import time
 import base64
-from io import BytesIO
+import tempfile
 
 app = Flask(__name__)
 
@@ -37,7 +37,7 @@ def process_files():
             file=audio
         )
 
-    transcript = transcript_response.text
+    transcript = transcript_response.get('text')
     print(f"Transcript: {transcript}")
 
     image_path = os.path.join(os.getcwd(), "image_file.png")
@@ -70,22 +70,24 @@ def process_files():
         max_tokens=50,
     )
 
-    response_text = response.choices[0].message.content
+    response_text = response['choices'][0]['message']['content']
     print(f"Response: {response_text}")
 
     # Generate speech from the response text using OpenAI's TTS API
-    speech_file = BytesIO()
-    tts_response = openai.audio.speech.create(
-        model="tts-1",
-        voice="alloy",
-        input=response_text
-    )
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as tmp_file:
+        tts_response = openai.audio.speech.create(
+            model="tts-1",
+            voice="alloy",
+            input=response_text
+        )
+        tts_response.stream_to_file(tmp_file.name)
+    
+        # Read the temporary file and encode it to base64
+        with open(tmp_file.name, 'rb') as speech_file:
+            speech_base64 = base64.b64encode(speech_file.read()).decode('utf-8')
 
-    tts_response.stream_to_file(speech_file)
-    speech_file.seek(0)  # Rewind the buffer for reading
-
-    # Encode the MP3 file to base64
-    speech_base64 = base64.b64encode(speech_file.read()).decode('utf-8')
+    # Clean up the temporary file
+    os.remove(tmp_file.name)
 
     # Return both the response text and the speech MP3 file
     return jsonify({
