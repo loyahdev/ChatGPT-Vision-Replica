@@ -17,7 +17,7 @@ def index():
 
 @app.route('/process', methods=['POST'])
 def process_files():
-    start_time = time.time()
+    #start_time = time.time()
 
     # Check if files are in the request
     if 'audio' not in request.files or 'image' not in request.files:
@@ -31,24 +31,24 @@ def process_files():
     audio_file.save(audio_path)
 
     # Transcribe audio using OpenAI Whisper API
-    with open(audio_path, "rb") as audio:
+    '''with open(audio_path, "rb") as audio:
         transcript_response = openai.audio.transcriptions.create(
             model="whisper-1",
             file=audio
-        )
+        )'''
 
-    transcript = transcript_response.text
-    print(f"Transcript: {transcript}")
+    '''transcript = transcript_response.text
+    print(f"Transcript: {transcript}")'''
 
     image_path = os.path.join(os.getcwd(), "image_file.png")
     image_file.save(image_path)
 
     # Verify image format and size
-    if not image_path.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
-        return jsonify({'error': 'Unsupported image format'}), 400
+    # if not image_path.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
+        # return jsonify({'error': 'Unsupported image format'}), 400
     
     image_size = os.path.getsize(image_path)
-    if image_size > 5 * 1024 * 1024:
+    if image_size > 10 * 1024 * 1024:
         return jsonify({'error': 'Image file size exceeds 20 MB'}), 400
     
     # Encode image to base64
@@ -76,8 +76,8 @@ def process_files():
     response_text = response.choices[0].message.content
     print(f"Response: {response_text}")
 
-    total_time = time.time() - start_time
-    print(f"Total Time: {total_time:.2f} seconds")
+    # total_time = time.time() - start_time
+    # print(f"Total Time: {total_time:.2f} seconds")
 
     return response_text
 
